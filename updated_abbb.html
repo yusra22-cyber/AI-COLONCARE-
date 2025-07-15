@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Colorectal Cancer Detection System - User Information</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+      <!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4rem 2rem;
+    background: gold;
+    border: 1px solid rgba(173,216,230,0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+                0 0 45px rgba(173,216,230,0.4);
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 20px;
+        }
+    .container h1{
+        font-size: 50px;
+        color: black;
+    }
+        header nav ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        header nav ul li {
+            margin-left: 1rem;
+        }
+        header nav ul li a {
+            color:white;
+            text-decoration: none;
+           
+        }
+        header nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .flex {
+            display: flex;
+        }
+        aside {
+            width: 15rem;
+            background: black;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+        aside ul {
+            list-style: none;
+            padding: 1.5rem 2rem 1.5rem;
+            margin: 0;
+        }
+        aside ul li {
+            margin-bottom: 1rem;
+        }
+        aside ul li a {
+            color: gold;
+            text-decoration: none;
+            font: bold;
+            font-size: 20px;
+            font-weight: 900;
+            padding: 10px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        aside ul li a:hover {
+        
+    
+            border-radius: 20px;
+            transform: scale(1.5);
+        }
+        main {
+            flex: 1;
+            margin: 2rem;
+        }
+        .card {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+
+        }
+          .card .flex{
+            margin-left: 3.5rem;
+            height:200px;
+          }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            
+        }
+        .form-group input, .form-group select {
+            width: 60%;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+        }
+        .form-group button {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #374151;
+        }
+      
+        .card img {
+            border-radius: 50%;
+        }
+        .card h2, .card h3 {
+            margin: 0;
+        }
+        .card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .card table th, .card table td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: left;
+        }
+       /* Profile Page Styles */
+#resultsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#resultsTable th {
+    background: #f5f5f5;
+    padding: 12px;
+    text-align: left;
+}
+
+#resultsTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.prediction-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prediction-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.hyperplastic { background: #e8f5e9; color: #2e7d32; }
+.serrated { background: #fff8e1; color: #ff8f00; }
+.tubular { background: #e3f2fd; color: #1565c0; }
+.tubulovillous { background: #fff3e0; color: #ef6c00; }
+.villous { background: #ffebee; color: #c62828; }
+
+.confidence {
+    font-size: 13px;
+    color: #666;
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 4px;
+    color: white;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast.success { background: #2ecc71; }
+.toast.error { background: #e74c3c; }
+.toast.info { background: #3498db; }
+
+@keyframes slideIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+/* Image modal */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.modal-content img {
+    max-height: 80vh;
+    max-width: 100%;
+}
+
+.close-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* Loading spinner */
+.loading-results {
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner {
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top: 3px solid #3498db;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Patient Profile</h1>
+        </div>
+    </header>
+    <div class="flex">
+        <aside>
+            <ul>
+                <li><a href="{{ url_for('website') }}"><i class="fas fa-home"></i> Home</a></li><br>
+                <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li><br>
+                <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li><br>
+                <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li><br>
+                <li><a href="{{ url_for('logout') }}" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+            </ul>
+        </aside>
+        <main>
+            <div class="card" >
+                <h1>User Profile</h1><br><br>
+                <div class="flex" >
+                    <div style="position: relative;">
+                        <img src="" alt="Profile picture of the user" id="profileImage" style="border-radius: 50%; width: 150px; height: 150px;">
+                        <i class="fas fa-camera" style="position: absolute; bottom: 10px; right: 10px; font-size: 20px; color: white; background-color: #1e3a8a; border-radius: 50%; padding: 5px;" onclick="document.getElementById('profileImageInput').click();"></i>
+                        <input type="file" id="profileImageInput" accept="image/*" style="display: none;" onchange="previewImage(event);" />
+
+                    </div>
+                    <div style="margin-left: 2.5rem;">
+                        <p id="userName">Name:</p>
+                        <p id="userEmail">Email: </p>
+                        <p id="userAge">Age: </p>
+                        <p id="userGender">Gender: </p>
+                    </div>
+                </div>
+                <form id="userInfoForm" style="margin-left: 2.5rem;">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="prediction-history">
+                <h3>Your Prediction History</h3>
+                
+                {% if predictions.items %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions.items %}
+                        <tr>
+                            <td><img src="{{ pred.image_url }}" width="100"></td>
+                            <td>
+                                {{ pred.prediction }}
+                                {% if not pred.is_colonoscopy %}
+                                <span class="badge bg-secondary">Non-Colonoscopy</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ "%.2f"|format(pred.confidence * 100) }}%</td>
+                            <td>{{ pred.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <nav aria-label="Prediction pagination">
+                    <ul class="pagination">
+                        {% if predictions.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('profile', page=predictions.prev_num) }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in predictions.iter_pages() %}
+                        <li class="page-item {% if page_num == predictions.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('profile', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if predictions.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('profile', page=predictions.next_num) }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% else %}
+                <div class="alert alert-info">No prediction history yet.</div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+  
+
+    <script>
+   // User Profile Form Handling
+   document.getElementById('userInfoForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        try {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+
+            // Enhanced validation
+            if (!name || name.length < 2) {
+                throw new Error('Please enter a valid name (min 2 characters)');
+            }
+
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                throw new Error('Please enter a valid email address');
+            }
+
+            // Update profile information
+            updateProfileDisplay(name, email, age, gender);
+            
+            // Save to server if available
+            if (await saveProfileToServer({ name, email, age, gender })) {
+                showToast('Profile updated successfully', 'success');
+            } else {
+                saveProfileToLocal({ name, email, age, gender });
+                showToast('Profile saved locally', 'info');
+            }
+            
+        } catch (error) {
+            console.error('Profile update error:', error);
+            showToast(error.message, 'error');
+        }
+    });
+
+    // Profile Image Preview with Enhanced Features
+    function previewImage(event) {
+        const profileImage = document.getElementById('profileImage');
+        const fileInput = event.target;
+        const uploadLabel = document.querySelector('.upload-label');
+        
+        if (!fileInput.files || fileInput.files.length === 0) {
+            return;
+        }
+
+        const file = fileInput.files[0];
+        
+        // Validate file
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        
+        if (!validTypes.includes(file.type)) {
+            showToast('Please upload a valid image (JPEG, PNG, JPG, WEBP)', 'error');
+            resetFileInput(fileInput);
+            return;
+        }
+
+        if (file.size > maxSize) {
+            showToast(`Image must be less than ${maxSize/1024/1024}MB`, 'error');
+            resetFileInput(fileInput);
+            return;
+        }
+
+        // Show upload progress
+        uploadLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        
+        const reader = new FileReader();
+        reader.onloadstart = () => {
+            profileImage.classList.add('loading');
+        };
+        reader.onload = function(e) {
+            profileImage.src = e.target.result;
+            profileImage.classList.remove('loading');
+            profileImage.classList.add('loaded');
+            uploadLabel.textContent = 'Change Image';
+            showToast('Profile image updated', 'success');
+            
+            // Save image to local storage
+            localStorage.setItem('profileImage', e.target.result);
+            
+            // Optionally upload to server
+            uploadProfileImage(file);
+        };
+        reader.onerror = () => {
+            profileImage.classList.remove('loading');
+            uploadLabel.textContent = 'Upload Image';
+            showToast('Error reading image file', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Results Management with Enhanced Features
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Load user profile first
+        await loadUserProfile();
+        
+        // Then load results
+        await loadResults();
+        
+        // Setup refresh button
+        document.getElementById('refreshResults').addEventListener('click', loadResults);
+        
+        // Setup result filtering
+        setupResultFilters();
+    });
+
+    async function loadResults() {
+        const tableBody = document.querySelector('#resultsTable tbody');
+        showLoadingState(tableBody);
+        
+        try {
+            // Try server first, then fallback to local storage
+            const results = await fetchResultsWithFallback();
+            
+            if (results.length === 0) {
+                showEmptyState(tableBody);
+                return;
+            }
+            
+            renderResults(results);
+            updateResultStats(results);
+            
+        } catch (error) {
+            console.error('Error loading results:', error);
+            showErrorState(tableBody, "Failed to load results. Please try again.");
+        }
+    }
+
+    // Helper Functions
+    function updateProfileDisplay(name, email, age, gender) {
+        document.getElementById('userName').textContent = name;
+        document.getElementById('userEmail').textContent = email;
+        document.getElementById('userAge').textContent = age ? `Age: ${age}` : '';
+        document.getElementById('userGender').textContent = gender ? `Gender: ${gender}` : '';
+    }
+
+    async function saveProfileToServer(profileData) {
+        try {
+            const response = await fetch('/api/profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify(profileData)
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('Error saving profile to server:', error);
+            return false;
+        }
+    }
+
+    function saveProfileToLocal(profileData) {
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
+    }
+
+    async function loadUserProfile() {
+        // Try server first
+        try {
+            const response = await fetch('/api/profile', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                }
+            });
+            
+            if (response.ok) {
+                const profile = await response.json();
+                updateProfileDisplay(profile.name, profile.email, profile.age, profile.gender);
+                
+                // Load profile image if available
+                if (profile.imageUrl) {
+                    document.getElementById('profileImage').src = profile.imageUrl;
+                } else if (localStorage.getItem('profileImage')) {
+                    document.getElementById('profileImage').src = localStorage.getItem('profileImage');
+                }
+                return;
+            }
+        } catch (error) {
+            console.warn('Using local profile data:', error);
+        }
+        
+        // Fallback to local storage
+        const localProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        if (localProfile) {
+            updateProfileDisplay(
+                localProfile.name, 
+                localProfile.email, 
+                localProfile.age, 
+                localProfile.gender
+            );
+        }
+        
+        // Load local profile image
+        if (localStorage.getItem('profileImage')) {
+            document.getElementById('profileImage').src = localStorage.getItem('profileImage');
+        }
+    }
+
+    function resetFileInput(input) {
+        input.value = '';
+        document.querySelector('.upload-label').textContent = 'Upload Image';
+    }
+
+    async function uploadProfileImage(file) {
+        try {
+            const formData = new FormData();
+            formData.append('profileImage', file);
+            
+            const response = await fetch('/api/upload-profile-image', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+        } catch (error) {
+            console.error('Error uploading profile image:', error);
+        }
+    }
+
+    function showLoadingState(tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="loading-results">
+                    <div class="spinner"></div>
+                    Loading results...
+                </td>
+            </tr>`;
+    }
+
+    function showEmptyState(tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="no-results">
+                    <i class="fas fa-info-circle"></i> No analysis history found
+                </td>
+            </tr>`;
+    }
+
+    function showErrorState(tableBody, message) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i> ${message}
+                </td>
+            </tr>`;
+    }
+
+    async function fetchResultsWithFallback() {
+        try {
+            const serverResults = await fetchResultsFromServer();
+            if (serverResults.length > 0) {
+                // Update local storage with fresh results
+                localStorage.setItem('imageProcessingResults', JSON.stringify(serverResults));
+                return serverResults;
+            }
+        } catch (error) {
+            console.warn('Using fallback local results:', error);
+        }
+        
+        // Fallback to local storage
+        const localResults = JSON.parse(localStorage.getItem('imageProcessingResults') || '[]');
+        return localResults;
+    }
+
+    function renderResults(results) {
+        const tableBody = document.querySelector('#resultsTable tbody');
+        tableBody.innerHTML = '';
+        
+        // Sort by date (newest first)
+        results.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+        
+        // Group by date
+        const groupedResults = groupResultsByDate(results);
+        
+        // Render grouped results
+        for (const [date, items] of Object.entries(groupedResults)) {
+            // Add date header row
+            const dateRow = document.createElement('tr');
+            dateRow.className = 'date-header';
+            dateRow.innerHTML = `<td colspan="4">${date}</td>`;
+            tableBody.appendChild(dateRow);
+            
+            // Add result rows
+            items.forEach(result => {
+                const row = document.createElement('tr');
+                row.className = 'result-row';
+                row.innerHTML = `
+                    <td>
+                        <div class="thumbnail-container">
+                            <img src="${ensureValidImageUrl(result.imageUrl)}" 
+                                 alt="Analysis result" 
+                                 class="thumbnail"
+                                 onerror="this.onerror=null;this.src='/static/images/image-placeholder.png';"
+                                 data-fullsize="${ensureValidImageUrl(result.imageUrl)}">
+                            <div class="thumbnail-overlay">
+                                <i class="fas fa-search-plus"></i>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${result.imageName || 'Untitled'}</td>
+                    <td class="prediction-cell">
+                        <span class="prediction-badge ${getPredictionClass(result.prediction)}">
+                            ${result.prediction}
+                        </span>
+                        <div class="confidence-meter">
+                            <div class="confidence-bar" 
+                                 style="width: ${Math.min(result.confidence * 100, 100)}%">
+                            </div>
+                            <span class="confidence-value">${(result.confidence * 100).toFixed(1)}%</span>
+                        </div>
+                    </td>
+                    <td>${formatTime(result.dateTime)}</td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Add click handler for image preview
+                row.querySelector('.thumbnail-container').addEventListener('click', () => {
+                    showImageModal(row.querySelector('img').dataset.fullsize);
+                });
+            });
+        }
+    }
+
+    function groupResultsByDate(results) {
+        const grouped = {};
+        
+        results.forEach(result => {
+            const date = formatDate(result.dateTime);
+            if (!grouped[date]) {
+                grouped[date] = [];
+            }
+            grouped[date].push(result);
+        });
+        
+        return grouped;
+    }
+
+    function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return isNaN(date) ? 'Unknown Date' : date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return isNaN(date) ? 'Unknown Time' : date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function getPredictionClass(prediction) {
+        return prediction.toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '');
+    }
+
+    function updateResultStats(results) {
+        const stats = {
+            total: results.length,
+            byType: {}
+        };
+        
+        results.forEach(result => {
+            if (!stats.byType[result.prediction]) {
+                stats.byType[result.prediction] = 0;
+            }
+            stats.byType[result.prediction]++;
+        });
+        
+        document.getElementById('totalResults').textContent = stats.total;
+        
+        const statsContainer = document.getElementById('resultStats');
+        statsContainer.innerHTML = '';
+        
+        for (const [type, count] of Object.entries(stats.byType)) {
+            const statElement = document.createElement('div');
+            statElement.className = 'stat-item';
+            statElement.innerHTML = `
+                <span class="stat-type ${getPredictionClass(type)}">${type}</span>
+                <span class="stat-count">${count}</span>
+            `;
+            statsContainer.appendChild(statElement);
+        }
+    }
+
+    function setupResultFilters() {
+        const filterInput = document.getElementById('resultsFilter');
+        if (filterInput) {
+            filterInput.addEventListener('input', () => {
+                const filterValue = filterInput.value.toLowerCase();
+                document.querySelectorAll('.result-row').forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    row.style.display = rowText.includes(filterValue) ? '' : 'none';
+                });
+            });
+        }
+    }
+    
+        // Helper functions
+        function ensureValidImageUrl(url) {
+            if (!url) return '/static/images/image-placeholder.png';
+            if (url.startsWith('http')) return url;
+            if (url.startsWith('/')) return window.location.origin + url;
+            return `${window.location.origin}/uploads/${url}`;
+        }
+    
+        function formatDateTime(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = new Date(timestamp);
+            return isNaN(date) ? timestamp : date.toLocaleString();
+        }
+    
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+    
+        function showImageModal(imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'image-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <img src="${imageUrl}" alt="Full size preview">
+                </div>
+            `;
+            
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                modal.remove();
+            });
+            
+            document.body.appendChild(modal);
+        }
+    </script>
+
+    
+</body>
+</html>

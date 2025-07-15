@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorectal Cancer Detection</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="{{ url_for('static', filename='images/logo222.png') }}" alt="Logo" style="height: 100px;">
+      
+
+      <h1 class="innovative-title">AI-COLONCARE</h1>
+    </div>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('website') }}"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li>
+      <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
+      <li class="dropdown">
+        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <ul class="dropdown-content">
+          <li><a href="{{ url_for('profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+          <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
+          <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Image Processing Section -->
+  <section class="processing-section">
+    <div class="processing-container">
+      <h2 class="section-title" style="font-size: 65px;"      >Image Processing Workflow</h2>
+      
+      <!-- Step 1: Insert Image -->
+      <div class="processing-step card" id="step1">
+        <h3 style="font-size: 20px;">Step 1: Insert Image</h3>
+        <div class="upload-area">
+          <div class="drop-zone upload-box" id="uploadBox">
+            <span class="drop-zone__prompt">Drop image here or click to upload</span>
+            <input type="file" name="image" id="imageInput" class="drop-zone__input" accept="image/*">
+          </div>
+          <div class="image-preview preview-box" id="imagePreview"></div>
+        </div>
+        <button class="btn-gold" id="nextStep1">Next</button>
+      </div>
+
+      <!-- Step 2: Process Image -->
+      <div class="processing-step card" id="step2" style="display: none;">
+        <h3>Step 2: Process Image</h3>
+        <div class="processing-content">
+          <div class="processing-info">
+            <p>Click the button below to start processing the image</p>
+            <button class="btn-gold" id="processButton">Process Image</button><br><br>
+          </div>
+          <div class="processing-status" id="processingStatus"></div>
+        </div>
+        <p id="nextStep2"></p>
+      </div>
+
+      <!-- Step 3: Show Results -->
+      <div class="processing-step card result-container" id="step3" style="display: none;">
+        <h3>Step 3: View Results</h3>
+        <div class="result-content" id="resultContent">
+          <div class="result-card analysis-result">
+            <h4 class="result-title">Analysis Complete</h4>
+            
+          </div>
+        </div>
+        <button class="btn-gold" id="restartProcess">Start Over</button><br><br>
+        
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Security and Initialization
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+    let isProcessing = false;
+    let currentFile = null;
+    let uploadedImageURL = null; // Track the object URL
+
+    // DOM Elements
+    const elements = {
+        steps: {
+            step1: document.getElementById('step1'),
+            step2: document.getElementById('step2'),
+            step3: document.getElementById('step3')
+        },
+        imageInput: document.getElementById('imageInput'),
+        uploadBox: document.getElementById('uploadBox'),
+        imagePreview: document.getElementById('imagePreview'),
+        processButton: document.getElementById('processButton'),
+        nextStep1: document.getElementById('nextStep1'),
+        nextStep2: document.getElementById('nextStep2'),
+        restartProcess: document.getElementById('restartProcess'),
+        processingStatus: document.getElementById('processingStatus'),
+        resultContent: document.getElementById('resultContent')
+        
+    };
+
+    // Initialize the application
+    function init() {
+        resetWorkflow();
+        setupEventListeners();
+        setupDragAndDrop();
+        validateSession();
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+        elements.imageInput.addEventListener('change', handleFileSelect);
+        elements.nextStep1.addEventListener('click', () => showStep(2));
+        elements.processButton.addEventListener('click', processImage);
+        elements.nextStep2.addEventListener('click', () => showStep(3));
+        elements.restartProcess.addEventListener('click', resetWorkflow);
+    }
+
+    // Drag and Drop Handling
+    function setupDragAndDrop() {
+        const dropZone = elements.uploadBox;
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+    }
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight() {
+        elements.uploadBox.classList.add('highlight');
+    }
+
+    function unhighlight() {
+        elements.uploadBox.classList.remove('highlight');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            elements.imageInput.files = files;
+            handleFileSelect({ target: elements.imageInput });
+        }
+    }
+
+    // File Handling
+    function handleFileSelect(event) {
+    
+        if (uploadedImageURL) {
+            URL.revokeObjectURL(uploadedImageURL);
+        }
+
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!validateFile(file)) {
+            showError('Invalid file type. Allowed: PNG, JPG, JPEG');
+            resetFileInput();
+            return;
+        }
+
+        if (file.size > 44 * 1024 * 1024) {
+            showError('File size exceeds 24MB limit');
+            resetFileInput();
+            return;
+        }
+
+        currentFile = file;
+        elements.nextStep1.disabled = false;
+        
+        // Create object URL for better performance
+        uploadedImageURL = URL.createObjectURL(file);
+        showPreview(file, uploadedImageURL);
+    }
+
+    function validateFile(file) {
+        const validExtensions = ['png', 'jpg', 'jpeg'];
+        const extension = file.name.split('.').pop().toLowerCase();
+        return validExtensions.includes(extension);
+    }
+
+    function showPreview(file, url) {
+        elements.uploadBox.style.display = 'none';
+        elements.imagePreview.innerHTML = `
+            <div class="image-preview-container">
+                <img src="${url}" alt="Upload preview" class="preview-image">
+                <div class="image-metadata">
+                    <i class="fas fa-image"></i>
+                    ${sanitizeFilename(file.name)} (${formatFileSize(file.size)})
+                </div>
+            </div>
+        `;
+    }
+
+    function sanitizeFilename(filename) {
+        return filename.substring(0, 30).replace(/[^\w.-]/g, '_');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' bytes';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        else return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    
+    // Image Processing
+    async function processImage() {
+    if (isProcessing || !currentFile) {
+        showError('Please select an image first');
+        return;
+    }
+    
+    isProcessing = true;
+    startProcessing();
+
+    try {
+        const formData = new FormData();
+        formData.append('file', currentFile);
+
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData,
+            headers: { 
+                'X-CSRF-Token': CSRF_TOKEN,
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (!response.ok) {
+            throw new Error(data.error || data.message || `Server error: ${response.status}`);
+        }
+
+        if (!data.success) {
+            throw new Error(data.message || "Processing failed");
+        }
+
+        // Validate response structure
+        if (!data.hasOwnProperty('is_colonoscopy') || 
+            !data.hasOwnProperty('binary_prediction') || 
+            !data.hasOwnProperty('image_url')) {
+            throw new Error("Invalid response format from server");
+        }
+
+        // Ensure image URL is properly formatted
+        data.image_url = ensureValidImageUrl(data.image_url);
+
+        if (data.is_colonoscopy) {
+            if (!data.polyp_prediction || !data.polyp_confidence) {
+                throw new Error("Missing polyp classification data");
+            }
+            showResults(data);
+        } else {
+            showNonColonoscopyResults(data);
+        }
+
+    } catch (error) {
+        console.error('Processing error:', error);
+        showError(error.message);
+    } finally {
+        isProcessing = false;
+        endProcessing();
+    }
+}
+function ensureValidImageUrl(url) {
+    if (!url) return '/static/images/fallback-image.jpg';
+    if (url.startsWith('http') || url.startsWith('/static/')) return url;
+    return `/static/uploads/${url.split('/').pop()}`;
+}
+
+
+
+// Add this function if missing
+function endProcessing() {
+    elements.processingStatus.innerHTML = '';
+    elements.processButton.disabled = false;
+}
+
+function showResults(data) {
+    if (!data || !elements.resultContent) {
+        showError("No data received or missing display element");
+        return;
+    }
+
+    try {
+        const resultHTML = `
+        <div class="result-container">
+            <div class="image-section">
+                <img src="${data.image_url}" 
+                     alt="Analysis result" 
+                     class="result-image"
+                     onerror="this.src='/static/images/fallback-image.jpg'">
+            </div><br><br>
+            <div style="flex:1; min-width:300px; max-width:600px;">
+                <div style="background:white; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+                    <div style="text-align:center; margin-bottom:25px;">
+                        <h3 style="margin:0 0 10px 0; color:#2c3e50; font-size:22px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                            <i class="fas fa-diagnoses" style="color:#3498db; font-weight:bold;"></i>
+                            Diagnosis Report
+                        </h3>
+                        <div style="background:#f8f9fa; padding:20px; border-radius:10px; border-left:4px solid #${getDiagnosisColor(data.polyp_prediction)}; margin:15px 0;">
+                            <h2 style="margin:0; color:#${getDiagnosisColor(data.polyp_prediction)}; font-size:28px; letter-spacing:1px; text-transform:uppercase;">
+                                ${data.polyp_prediction.toUpperCase()} POLYP
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div style="margin:25px 0;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="font-weight:bold; color:#2c3e50; display:flex; align-items:center; gap:6px;">
+                                <i class="fas fa-chart-line" style="color:#3498db; font-weight:bold;"></i> Model Confidence
+                            </span>
+                            <span>${(data.polyp_confidence * 100).toFixed(1)}%</span>
+                        </div>
+                        <div style="height:14px; background:#ecf0f1; border-radius:7px; overflow:hidden; position:relative;">
+                            <div style="height:100%; width: ${data.polyp_confidence * 100}%; background: #${getDiagnosisColor(data.polyp_prediction)}; border-radius:7px; transition:width 1s ease;"></div>
+                        </div>
+                    </div>
+                    
+                    ${getRiskIndicator(data.polyp_prediction)}
+                    ${getRecommendation(data.polyp_prediction)}
+                </div>
+            </div>
+        </div>`;
+
+        elements.resultContent.innerHTML = resultHTML;
+        showStep(3);
+        
+    } catch (error) {
+        console.error("Result display error:", error);
+        showError("Failed to display results. Please check console for details.");
+    }
+}
+function showNonColonoscopyResults(data) {
+    try {
+        if (!data) throw new Error("No data received");
+        
+        // Enhanced message for non-colonoscopy images
+        let detailedMessage = '';
+        if (data.binary_confidence < 0.7) {
+            detailedMessage = 'The image is unclear or not recognizable as medical imagery.';
+        } else {
+            detailedMessage = `The system identified this as ${data.binary_prediction.toLowerCase()} with ${(data.binary_confidence * 100).toFixed(1)}% confidence.`;
+        }
+
+        elements.resultContent.innerHTML = `
+        <div class="result-container">
+            <div class="image-section">
+                <img src="${data.image_url}" 
+                     alt="Uploaded image" 
+                     class="result-image"
+                     onerror="this.src='/static/images/fallback-image.jpg'">
+                <div class="image-meta">
+                    <i class="fas fa-info-circle"></i> ${data.image_name}
+                </div>
+            </div>
+            
+            <div class="result-details">
+                <div class="diagnosis-header" style="border-left-color: #e74c3c">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle" style="color:#e74c3c"></i>
+                        Non-Colonoscopy Image Detected
+                    </h3>
+                    <div class="confidence-display">
+                        <span>Confidence: ${(data.binary_confidence * 100).toFixed(1)}%</span>
+                        <div class="confidence-bar" style="width: ${data.binary_confidence * 100}%"></div>
+                    </div>
+                </div>
+
+                <div class="result-message">
+                    <p>${detailedMessage}</p>
+                    <div class="recommendation-box">
+                        <h4><i class="fas fa-lightbulb"></i> Recommended Action:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Upload a clear colonoscopy image</li>
+                            <li><i class="fas fa-check-circle"></i> Ensure proper lighting and focus</li>
+                            <li><i class="fas fa-check-circle"></i> Use supported formats (JPEG, PNG)</li>
+                            <li><i class="fas fa-check-circle"></i> Avoid blurry or rotated images</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        showStep(3);
+    } catch (error) {
+        console.error("Non-colonoscopy result error:", error);
+        showError("Could not display results. Please try again.");
+    }
+}
+    // Reset Functionality
+    function resetWorkflow() {
+        // Clean up object URLs
+        if (uploadedImageURL) {
+            URL.revokeObjectURL(uploadedImageURL);
+            uploadedImageURL = null;
+        }
+        
+        // Reset all variables
+        isProcessing = false;
+        currentFile = null;
+        window.predictionResult = null;
+        
+        // Reset file input
+        resetFileInput();
+        
+        // Reset UI elements
+        elements.processingStatus.innerHTML = '';
+        elements.resultContent.innerHTML = `
+            <div class="result-card analysis-result">
+                <h4 class="result-title">Analysis Complete</h4>
+            </div>
+        `;
+        
+        // Reset buttons
+        elements.nextStep1.disabled = true;
+        elements.nextStep2.disabled = true;
+        elements.processButton.disabled = false;
+        
+        // Show first step
+        showStep(1);
+    }
+
+    function resetFileInput() {
+        elements.imageInput.value = '';
+        elements.imagePreview.innerHTML = '';
+        elements.uploadBox.style.display = 'flex';
+    }
+
+
+function createImageElement(url, altText, className = '') {
+    const img = document.createElement('img');
+    img.alt = altText || 'Analysis result';
+    img.className = className || 'result-image';
+    
+    // Set src after creating element to ensure onerror works
+    img.src = ensureValidImageUrl(url);
+    
+    img.onerror = function() {
+        console.error('Failed to load image:', this.src);
+        this.src = '/static/images/fallback-image.jpg';
+        this.classList.add('error-image');
+    };
+    
+    return img;
+}
+    // UI Helpers
+    function startProcessing() {
+        elements.processButton.disabled = true;
+        elements.processingStatus.innerHTML = `
+            <div class="processing-indicator">
+                <div class="spinner"></div>
+                <p>Analyzing tissue sample...</p>
+            </div>
+        `;
+    }
+
+    
+
+    function showStep(stepNumber) {
+        // Hide all steps first
+        Object.values(elements.steps).forEach(step => {
+            step.style.display = 'none';
+        });
+        
+        // Show the requested step
+        elements.steps[`step${stepNumber}`].style.display = 'block';
+    }
+
+    function handleProcessingError(error) {
+        let message = error.message;
+        if (message.includes('Failed to fetch' )) {
+            message = 'Connection to server failed. Please check your network.';
+        } else if (message.includes('401')) {
+            message = 'Session expired. Redirecting to login...';
+            setTimeout(() => window.location.href = '/login', 2000);
+        }
+
+        elements.processingStatus.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${message}</p>
+                <button class="retry-button" onclick="location.reload()">Try Again</button>
+            </div>
+        `;
+        elements.processButton.disabled = false;
+    }
+    function getDiagnosisColor(binary_prediction) {
+        const colors = {
+            'Non-Colonoscopy': '#3399bd',
+        };
+        return colors[binary_prediction] || '#7f8c8d';
+    }    
+    // Medical Content Helpe
+    function getDiagnosisColor(polyp_prediction) {
+        const colors = {
+        'Hyperplastic': '3498db',
+        'Serrated': 'f39c12',
+        'Tubular': '2ecc71',
+        'Tubulovillous': 'e74c3c',
+        'Villous': 'c0392b'
+        };
+        return colors[polyp_prediction] || '#7f8c8d';
+    }
+
+    function getRiskIndicator(polyp_prediction) {
+        const riskData = {
+            'Hyperplastic': { level: 'Low', color: '#3498db', icon: 'fa-info-circle', },
+            'Serrated': { level: 'Medium', color: '#f39c12', icon: 'fa-exclamation-triangle',  },
+            'Tubular': { level: 'Low', color: '#2ecc71', icon: 'fa-info-circle',  },
+            'Tubulovillous': { level: 'High', color: '#e74c3c', icon: 'fa-exclamation-circle',  },
+            'Villous': { level: 'Critical', color: '#c0392b', icon: 'fa-radiation',  }
+        };
+        const risk = riskData[polyp_prediction] || { level: 'Unknown', color: '#95a5a6', icon: 'fa-question-circle' };
+        
+        return `
+            <div class="risk-indicator" style="background:${risk.color}10; border-left:4px solid ${risk.color}; padding:15px; border-radius:8px; margin-bottom:20px;">
+               <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+               <i class="fas ${risk.icon}" style="color:${risk.color}; font-size:24px; font-weight:bold;"></i>
+             <div>
+              <div style="font-size:14px; color:#7f8c8d;">Risk Assessment</div>
+              <div style="font-size:20px; font-weight:bold; color:${risk.color};">
+                ${risk.level} Risk
+              </div>
+            </div>
+            </div>
+            
+        </div>
+        `;
+    }
+
+    function getRecommendation(polyp_prediction) {
+        const recommendations = {
+            'Hyperplastic': [ 'Generally benign polyps with minimal cancer risk','Recommend removal if >10mm',
+            'Follow-up in 5-10 years',
+            'Consider genetic testing if multiple'],
+            'Serrated': [ 'Serrated polyps have potential for malignancy through alternate pathway.','Complete removal recommended',
+            'Follow-up in 3 years',
+            'Consider advanced imaging'],
+            'Tubular': [ 'Low-risk adenomas but may progress over time.','Complete removal recommended',
+            'Follow-up in 3-5 years',
+            'Increased surveillance if multiple'],
+            'Tubulovillous': [ 'Higher malignant potential requiring urgent attention.','Urgent removal recommended',
+            'Follow-up in 1-3 years',
+            'Consider referral to specialist'],
+            'Villous': [ 'High malignant potential requiring immediate intervention.',
+          'Immediate surgical consultation',
+            'Biopsy of surrounding tissue',
+            '6-month follow-up required']
+        };
+        
+        const items = (recommendations[polyp_prediction] || ['Consult with specialist']).map(item => `<li>${item}</li>`).join('');
+        
+        return `
+        <div style="background:#f8f9fa; padding:15px; border-radius:8px; border-left:4px solid #3498db;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <i class="fas fa-clipboard-check" style="color:#3498db; font-size:24px; font-weight:bold;"></i>
+            
+            </div>
+
+            <div class="recommendations">
+               <div>
+              <div style="font-size:14px; color:#7f8c8d;">Clinical Recommendation</div>
+              <div style="font-size:18px; font-weight:bold; color:#2c3e50;">
+                Action Plan
+              </div>
+                <ul>${items}</ul>
+            </div>
+            </div>
+        `;
+    }
+
+    // Start the application
+    init();
+</script>
+  
+</body>
+</html>
+
+

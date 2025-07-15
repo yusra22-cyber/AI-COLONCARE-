@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorectal Cancer Detection</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+
+  
+</head>
+
+<body>
+  
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="{{ url_for('static', filename='images/logo222.png') }}" alt="Logo" style="height: 100px;">
+      
+
+      <h1 class="innovative-title">AI-COLONCARE</h1>
+    </div>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('website') }}"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li>
+      <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
+      <li class="dropdown">
+        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <ul class="dropdown-content">
+          <li><a href="{{ url_for('profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+          <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
+          <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Dangerous Polyp or Benign? Let AI Answer in Seconds.</h1>
+      <p>"Why settle for 'maybe' when AI gives you 'exactly-which-type'?"</p><br><br>
+    
+      <div class="cta-buttons">
+        <a href="#features" class="btn btn-gold">
+          <i class="fas fa-lightbulb"></i> Learn More
+        </a>
+        <a href="{{ url_for('indexx') }}" class="btn btn-gold">
+          <i class="fas fa-search"></i> Start Classification
+        </a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="{{ url_for('static', filename='images/ColonCancer_Blog.jpg') }}" alt="AI Illustration" width="700" height="400" class="light-effect">
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <h2>Our Key Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>AI-Powered Analysis</h3>
+        <p>Advanced algorithms for accurate detection</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⏱️</div>
+        <h3>Rapid Screening</h3>
+        <p>Quick and efficient diagnostic process</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure & Private</h3>
+        <p>Complete data protection</p>
+      </div>
+    </div>
+  </section>
+
+  
+<!-- About Our Technology -->
+<section class="about-tech" style="padding: 4rem 1rem; background: #ffffff; max-width: 1500px; margin: 0 auto;">
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <h2 style="color: #222; font-size: 2rem;">
+      <span style="color: #D4AF37; font-weight: bold;">▍</span> Smart Polyp Analysis
+    </h2>
+    <p style="color: #555; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+      Our AI instantly analyzes colonoscopy images to identify different polyp types, 
+      helping doctors make faster, more accurate decisions.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center;">
+    <div>
+      <img src="{{ url_for('static', filename='images/colorectal-cancer_ss_639747862.jpg') }}" alt="AI analyzing polyps" style="width: 70%; margin-left: 100px;  border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+    </div>
+    <div style="display: grid; gap: 3.5rem;">
+      <!-- Feature 1 -->
+      <div style="display: flex; gap: 1.2rem; align-items: flex-start;">
+        <div style="flex-shrink: 0; width: 50px; height: 50px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#D4AF37" style="transform: rotate(-10deg);">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="color: #222; margin: 0 0 0.3rem 0; font-size: 1.2rem;">How It Works</h3>
+          <p style="color: #666; margin: 0;">Upload colonoscopy images and receive automatic polyp classification within seconds.</p>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div style="display: flex; gap: 1.2rem; align-items: flex-start;">
+        <div style="flex-shrink: 0; width: 50px; height: 50px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#D4AF37">
+            <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.8L18 10v8h-2v-6H8v6H6v-8l6-4.2z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="color: #222; margin: 0 0 0.3rem 0; font-size: 1.2rem;">Built for Doctors</h3>
+          <p style="color: #666; margin: 0;">Designed to fit seamlessly into clinical workflows without disruption.</p>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div style="display: flex; gap: 1.2rem; align-items: flex-start;">
+        <div style="flex-shrink: 0; width: 50px; height: 50px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#D4AF37">
+            <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="color: #222; margin: 0 0 0.3rem 0; font-size: 1.2rem;">Continuously Learning</h3>
+          <p style="color: #666; margin: 0;">Improves accuracy as it processes more cases over time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+</section>
+
+
+<!-- Footer -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Contact Us</h3>
+      <p>Email: info@cancerdetection.com</p>
+      <p>Phone: +1 (555) 123-4567</p>
+    </div>
+    <div class="footer-section">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="website.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="website.html#features">Features</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Follow Us</h3>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2023 Colorectal Cancer Detection. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="scripts.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

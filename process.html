@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorectal Cancer Detection</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="logo222.png" alt="Logo" style="height: 100px;">
+      
+
+      <h1 class="innovative-title">AI-COLONCARE</h1>
+    </div>
+    <ul class="nav-links">
+      <li><a href="website.html"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+      <li><a href="file.html"><i class="fas fa-envelope"></i> Contact</a></li>
+      <li class="dropdown">
+        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <ul class="dropdown-content">
+          <li><a href="updated_abbb.html"><i class="fas fa-user"></i> Profile</a></li>
+          <li><a href="setting.html"><i class="fas fa-cog"></i> Settings</a></li>
+          <li><a href="home.html"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Image Processing Section -->
+  <section class="processing-section">
+    <div class="processing-container">
+      <h2 class="section-title" style="font-size: 65px;"      >Image Processing Workflow</h2>
+      
+      <!-- Step 1: Insert Image -->
+      <div class="processing-step card" id="step1">
+        <h3 style="font-size: 20px;" >Step 1: Insert Image</h3>
+        <div class="upload-area">
+          <div class="drop-zone upload-box">
+            <span class="drop-zone__prompt">Drop image here or click to upload</span><br>
+            <input type="file" name="image" id="imageInput" class="drop-zone__input" accept="image/*">
+          </div>
+          <div class="image-preview preview-box" id="imagePreview" onclick="openModal()"></div>
+        </div>
+        <button class="btn-gold" id="nextStep1">Next</button>
+      </div>
+
+      <!-- Step 2: Process Image -->
+      <div class="processing-step card" id="step2" style="display: none;">
+        <h3>Step 2: Process Image</h3>
+        <div class="processing-content">
+          <div class="processing-info">
+            <p>Click the button below to start processing the image</p>
+            <button class="btn-gold" id="processButton">Process Image</button><br><br>
+          </div>
+          <div class="processing-status" id="processingStatus"></div>
+        </div>
+        <button class="btn-gold" id="nextStep2">Next</button>
+      </div>
+
+      <!-- Step 3: Show Results -->
+      <div class="processing-step card result-container" id="step3" style="display: none;">
+        <h3>Step 3: View Results</h3>
+        <div class="result-content" id="resultContent">
+          <div class="result-card analysis-result">
+            <h4 class="result-title">Analysis Complete</h4>
+            <div class="result-details">
+              <p class="result-text">No abnormalities detected</p>
+             
+            </div>
+          </div>
+        </div>
+        <button class="btn-gold" id="restartProcess">Start Over</button><br><br>
+        <div class="chatbot-recommendation">
+          <p>Need more information? Chat with our AI assistant for personalized recommendations.</p>
+          <button class="chatbot-recommendation-button" onclick="toggleChat()">
+            <i class="fas fa-comments"></i> Chat Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chatbot Section -->
+<div class="chatbot">
+  <button class="chatbot-button" onclick="toggleChat()">
+    <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" width="20">  Assistant
+  </button>
+  <div class="chat-window" id="chatWindow" style="display:none">
+    <div class="chat-header">
+      <h3>Colorectal Cancer Expert</h3>
+      <button class="close-chat" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="message bot">
+        <strong>Colorectal Cancer Information Assistant</strong><br><br>
+        I can help with:<br>
+        • Early detection signs and symptoms<br>
+        • Screening recommendations<br>
+        • Treatment options<br>
+        • Specialist doctors in Pakistan<br>
+        • Dietary and lifestyle advice<br>
+        • Emotional support
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Ask about colorectal cancer..." 
+             onkeypress="if(event.key === 'Enter') sendMessage()">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+<script>
+  // Select elements
+const step1 = document.getElementById('step1');
+const step2 = document.getElementById('step2');
+const step3 = document.getElementById('step3');
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const processButton = document.getElementById('processButton');
+const processingStatus = document.getElementById('processingStatus');
+const dropZone = document.querySelector('.drop-zone');
+const nextStep1 = document.getElementById('nextStep1');
+const nextStep2 = document.getElementById('nextStep2');
+const restartProcess = document.getElementById('restartProcess');
+
+// Open file dialog on click (only if no image is selected)
+//dropZone.addEventListener('click', () => {
+  ///  if (!imageInput.files.length) {
+    //    imageInput.click();
+   // }
+   // event.stopPropagation();
+//});
+
+// Handle file selection
+imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Drag & drop functionality
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drop-zone--over');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drop-zone--over');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drop-zone--over');
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Step 1: Move to next step if image is uploaded
+nextStep1.addEventListener('click', () => {
+    if (imageInput.files.length) {
+        step1.style.display = 'none';
+        step2.style.display = 'block';
+    } else {
+        alert('Please upload an image first');
+    }
+});
+
+// Step 2: Process Image
+processButton.addEventListener('click', () => {
+    processingStatus.innerHTML = `
+        <div class="processing-animation">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
+        </div>
+    `;
+
+    setTimeout(() => {
+        processingStatus.innerHTML = '<p>Processing complete!</p>';
+
+        // Store results in local storage
+        const results = JSON.parse(localStorage.getItem('imageProcessingResults')) || [];
+        const result = {
+            imageName: imageInput.files[0].name,
+            status: 'No abnormalities detected', // Update this based on actual processing results
+            dateTime: new Date().toLocaleString()
+        };
+        results.push(result);
+        localStorage.setItem('imageProcessingResults', JSON.stringify(results));
+
+        nextStep2.disabled = false;
+    }, 3000);
+});
+
+// Step 3: Show Results
+nextStep2.addEventListener('click', () => {
+    step2.style.display = 'none';
+    step3.style.display = 'block';
+});
+
+// Restart process
+restartProcess.addEventListener('click', () => {
+    step3.style.display = 'none';
+    step1.style.display = 'block';
+    imagePreview.innerHTML = ''; // Clear preview
+    imageInput.value = ''; // Reset file input
+    nextStep2.disabled = true;
+});
+
+// Open modal for image preview
+function openModal() {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <span class="close" onclick="this.parentElement.style.display='none'">&times;</span>
+        <img class="modal-content" id="modalImage" src="${imagePreview.querySelector('img').src}">
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+}
+
+// Chat functionality
+function toggleChat() {
+    const chatWindow = document.getElementById('chatWindow');
+    chatWindow.style.display = chatWindow.style.display === 'block' ? 'none' : 'block';
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (message) {
+        const chatBody = document.getElementById('chatBody');
+        chatBody.innerHTML += `<div class="message user">${message}</div>`;
+        input.value = '';
+        chatBody.scrollTop = chatBody.scrollHeight;
+        setTimeout(() => {
+            chatBody.innerHTML += `<div class="message bot">Thank you for your message. Our team will respond shortly.</div>`;
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 500);
+    }
+}
+
+
+
+// Enhanced Knowledge Base
+const cancerData = {
+  // Category 1: General Understanding
+  "general_understanding": {
+    "colorectal_cancer": `
+      <div class="info-card">
+        <strong>What is Colorectal Cancer?</strong><br>
+        Colorectal cancer starts in the colon or rectum. It often begins as small polyps, some of which can become cancerous over time. Early detection helps in prevention and cure.
+      </div>
+    `,
+    "colon_polyps": `
+      <div class="info-card">
+        <strong>What are Colon Polyps?</strong><br>
+        Colon polyps are growths in the colon lining. Some are harmless, while others, like adenomatous and serrated polyps, can turn cancerous if untreated.
+      </div>
+    `
+  },
+  
+  // Category 2: Types of Polyps & Their Diets
+  "types_and_diets": {
+    "tubular_adenoma": `
+      <div class="info-card">
+        <strong>Diet for Tubular Adenomas:</strong><br>
+        Eat high-fiber foods like whole grains (oats, brown rice), leafy greens (spinach, kale), beans, lentils, and fruits with skin (apples, pears).<br>
+        Avoid processed meats, red meat, and high-fat dairy.
+      </div>
+    `,
+    "villous_adenoma": `
+      <div class="info-card">
+        <strong>Diet for Villous Adenomas:</strong><br>
+        Choose antioxidant-rich foods like blueberries and tomatoes, Omega-3 sources like flaxseeds and walnuts, and cruciferous vegetables like broccoli and cabbage.<br>
+        Avoid fried food, sugary snacks, and alcohol.
+      </div>
+    `,
+    "tubulovillous_adenomas": `
+      <div class="info-card">
+        <strong>Diet for Tubulovillous Adenomas:</strong><br>
+        Balanced meals with whole vegetables (carrots, cucumbers), grilled chicken or fish, and low-fat yogurt.<br>
+        Avoid high-sodium foods and soda.
+      </div>
+    `,
+    "serrated_polyps": `
+      <div class="info-card">
+        <strong>Diet for Serrated Polyps:</strong><br>
+        Anti-inflammatory foods like berries, turmeric, and green tea, olive oil, almonds, and probiotic-rich food (kimchi, kefir).<br>
+        Avoid junk food, processed sugar, and preservatives.
+      </div>
+    `,
+    "hyperplastic_polyps": `
+      <div class="info-card">
+        <strong>Diet for Hyperplastic Polyps:</strong><br>
+        Follow a gut-friendly diet with high fiber, hydration (8+ glasses of water), and foods like bananas, applesauce, and lightly steamed veggies.
+      </div>
+    `
+  },
+  
+  // Category 3: Medications
+  "medications": {
+    "colorectal_polyp_treatment": `
+      <div class="info-card">
+        <strong>Medications for Colorectal Polyps:</strong><br>
+        Doctors may prescribe aspirin or NSAIDs (for reducing polyp risk), iron supplements (if anemia is caused by bleeding), and Vitamin D and calcium (for prevention).<br>
+        Always consult a specialist before starting medication.
+      </div>
+    `
+  },
+  
+  // Category 4: Screening Tests
+  "screening_tests": {
+    "tests": `
+      <div class="info-card">
+        <strong>Main Tests for Colorectal Cancer:</strong><br>
+        1. Colonoscopy: Best method to find and remove polyps<br>
+        2. Sigmoidoscopy: Examines lower colon<br>
+        3. FIT Test: Checks blood in stool<br>
+        4. CT Colonography: Virtual colonoscopy<br>
+        5. DNA Stool Test (Cologuard): Checks DNA changes in stool
+      </div>
+    `,
+    "screening_age": `
+      <div class="info-card">
+        <strong>When to Get Tested:</strong><br>
+        Screening usually starts at age 45–50, or earlier if you have a family history or are showing symptoms (e.g., bleeding, weight loss, fatigue).
+      </div>
+    `
+  },
+  
+  // Category 5: Precautions & Lifestyle
+  "precautions_lifestyle": {
+    "prevention": `
+      <div class="info-card">
+        <strong>Preventing Colon Polyps & Cancer:</strong><br>
+        • Eat fiber-rich foods<br>
+        • Avoid smoking & limit alcohol<br>
+        • Exercise at least 30 mins daily<br>
+        • Get regular screenings<br>
+        • Maintain a healthy weight
+      </div>
+    `,
+    "stress": `
+      <div class="info-card">
+        <strong>Can Stress Increase Cancer Risk?</strong><br>
+        Chronic stress may weaken your immune system. Managing stress through relaxation, prayer, or exercise is helpful.
+      </div>
+    `
+  },
+  
+  // Category 6: Symptoms
+  "symptoms": {
+    "early_signs": `
+      <div class="info-card">
+        <strong>Early Signs of Colorectal Cancer:</strong><br>
+        • Blood in stool<br>
+        • Changes in bowel habits<br>
+        • Sudden weight loss<br>
+        • Fatigue<br>
+        • Abdominal pain
+      </div>
+    `,
+    "pain": `
+      <div class="info-card">
+        <strong>Is It Always Painful?</strong><br>
+        Not always. Many cases are silent, which is why regular screening is vital.
+      </div>
+    `
+  },
+  
+  // Category 7: Doctors in Pakistan
+  "doctors_in_pakistan": {
+    "doctors": `
+      <div class="info-card">
+        <strong>Cancer Doctors in Pakistan:</strong><br>
+        Dr. Shahid Rasul – Liaquat National Hospital, Karachi<br>
+        Dr. Arif Jamshed – Shaukat Khanum Hospital, Lahore<br>
+        Prof. Dr. Muhammad Umar – Rawalpindi Medical University<br>
+        Dr. Muhammad Ali – Aga Khan University, Karachi<br>
+        Dr. Aftab Mohsin – INMOL Hospital, Lahore
+      </div>
+    `
+  },
+  
+  // Category 8: Emotional Support
+  "emotional_support": {
+    "fear": `
+      <div class="info-card">
+        <strong>What Should I Do if I'm Scared After Hearing I Have Polyps?</strong><br>
+        It's normal to feel afraid, but most polyps are treatable. Early diagnosis and a healthy lifestyle give the best outcomes. You are not alone—stay strong!
+      </div>
+    `,
+    "recovery": `
+      <div class="info-card">
+        <strong>Can I Recover Fully?</strong><br>
+        Yes, if detected early and managed well through diet, medication, and regular screening, you can live a healthy life.
+      </div>
+    `
+  }
+};
+
+// Chatbot Functions
+function toggleChat() {
+  const chatWindow = document.getElementById('chatWindow');
+  chatWindow.style.display = chatWindow.style.display === 'block' ? 'none' : 'block';
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim().toLowerCase();
+  const chatBody = document.getElementById('chatBody');
+  
+  if (message) {
+    // Add user message
+    chatBody.innerHTML += `<div class="message user">${input.value}</div>`;
+    input.value = '';
+    
+    // Generate response
+    let botResponse = "";
+    
+    if (message.includes("colorectal cancer") || message.includes("what is colorectal cancer")) {
+      botResponse = cancerData.general_understanding.colorectal_cancer;
+    }
+    else if (message.includes("colon polyps")) {
+      botResponse = cancerData.general_understanding.colon_polyps;
+    }
+    else if (message.includes("tubular adenomas")) {
+      botResponse = cancerData.types_and_diets.tubular_adenoma;
+    }
+    else if (message.includes("villous adenomas")) {
+      botResponse = cancerData.types_and_diets.villous_adenoma;
+    }
+    else if (message.includes("tubulovillous adenomas")) {
+      botResponse = cancerData.types_and_diets.tubulovillous_adenomas;
+    }
+    else if (message.includes("serrated polyps")) {
+      botResponse = cancerData.types_and_diets.serrated_polyps;
+    }
+    else if (message.includes("hyperplastic polyps")) {
+      botResponse = cancerData.types_and_diets.hyperplastic_polyps;
+    }
+    else if (message.includes("medications")) {
+      botResponse = cancerData.medications.colorectal_polyp_treatment;
+    }
+    else if (message.includes("screening tests")) {
+      botResponse = cancerData.screening_tests.tests + cancerData.screening_tests.screening_age;
+    }
+    else if (message.includes("prevention") || message.includes("lifestyle")) {
+      botResponse = cancerData.precautions_lifestyle.prevention + cancerData.precautions_lifestyle.stress;
+    }
+    else if (message.includes("symptoms")) {
+      botResponse = cancerData.symptoms.early_signs + cancerData.symptoms.pain;
+    }
+    else if (message.includes("doctors in pakistan")) {
+      botResponse = cancerData.doctors_in_pakistan.doctors;
+    }
+    else if (message.includes("emotional support") || message.includes("fear")) {
+      botResponse = cancerData.emotional_support.fear;
+    }
+    else if (message.includes("recovery")) {
+      botResponse = cancerData.emotional_support.recovery;
+    }
+    else {
+      botResponse = `
+        <div class="message bot">
+          I can provide information about:<br>
+          • <button class="quick-btn" onclick="quickResponse('symptoms')">Symptoms</button>
+          • <button class="quick-btn" onclick="quickResponse('diet')">Diet for Polyps</button>
+          • <button class="quick-btn" onclick="quickResponse('screening')">Screening Tests</button>
+          • <button class="quick-btn" onclick="quickResponse('doctors')">Doctors</button>
+          • <button class="quick-btn" onclick="quickResponse('prevention')">Prevention & Lifestyle</button>
+          • <button class="quick-btn" onclick="quickResponse('emotional support')">Emotional Support</button>
+        </div>
+      `;
+    }
+    
+    // Add response
+    setTimeout(() => {
+      chatBody.innerHTML += `<div class="message bot">${botResponse}</div>`;
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 500);
+  }
+}
+
+function quickResponse(type) {
+  const chatBody = document.getElementById('chatBody');
+  let response = "";
+  
+  switch(type) {
+    case 'symptoms':
+      response = cancerData.symptoms.early_signs + cancerData.symptoms.pain;
+      break;
+    case 'diet':
+      response = cancerData.types_and_diets.tubular_adenoma + cancerData.types_and_diets.villous_adenoma + cancerData.types_and_diets.tubulovillous_adenomas + cancerData.types_and_diets.serrated_polyps + cancerData.types_and_diets.hyperplastic_polyps;
+      break;
+    case 'screening':
+      response = cancerData.screening_tests.tests + cancerData.screening_tests.screening_age;
+      break;
+    case 'doctors':
+      response = cancerData.doctors_in_pakistan.doctors;
+      break;
+    case 'prevention':
+      response = cancerData.precautions_lifestyle.prevention + cancerData.precautions_lifestyle.stress;
+      break;
+    case 'emotional support':
+      response = cancerData.emotional_support.fear + cancerData.emotional_support.recovery;
+      break;
+  }
+  
+  chatBody.innerHTML += `<div class="message bot">${response}</div>`;
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+</script>
+ 
+</body>
+</html>
