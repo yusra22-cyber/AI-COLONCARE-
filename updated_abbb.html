@@ -7,10 +7,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
       <!-- CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="style.css">
 
 <!-- JS -->
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="script.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -300,10 +300,10 @@
     <div class="flex">
         <aside>
             <ul>
-                <li><a href="{{ url_for('website') }}"><i class="fas fa-home"></i> Home</a></li><br>
-                <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li><br>
-                <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li><br>
-                <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li><br>
+                <li><a href="website.html"><i class="fas fa-home"></i> Home</a></li><br>
+                <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li><br>
+                <li><a href="file.html"><i class="fas fa-envelope"></i> Contact</a></li><br>
+                <li><a href="setting.html"><i class="fas fa-cog"></i> Settings</a></li><br>
                 <li><a href="{{ url_for('logout') }}" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
             </ul>
         </aside>
@@ -867,3 +867,4 @@
     
 </body>
 </html>
+
