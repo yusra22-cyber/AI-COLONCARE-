@@ -52,18 +52,7 @@
             <div class="w-full md:w-1/2 {% if register %}hidden{% endif %}" id="loginAccess">
                 <h1 class="text-3xl font-bold mb-6 text-center text-gold">Log in to your account</h1>
                 
-                <!-- Flash messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            {% if not register or (register and category != 'success') %}
-                                <div class="alert alert-{{ category }} mb-4 p-3 rounded {{ 'bg-red-100 text-red-700' if category == 'danger' else 'bg-green-100 text-green-700' }}">
-                                    {{ message }}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
+              
                 
                 <form class="space-y-6" action="{{ url_for('login') }}" method="POST" id="loginForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -93,19 +82,7 @@
             <!-- Register Form -->
             <div class="w-full md:w-1/2 {% if not register %}hidden{% endif %}" id="registerAccess">
                 <h1 class="text-3xl font-bold mb-6 text-center text-gold">Create new account</h1>
-                
-                <!-- Flash messages for register -->
-                {% if register %}
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }} mb-4 p-3 rounded {{ 'bg-red-100 text-red-700' if category == 'danger' else 'bg-green-100 text-green-700' }}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                {% endif %}
+              
                 
                 <form class="space-y-6" action="{{ url_for('register') }}" method="POST" id="registerForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -142,7 +119,7 @@
             
             <!-- Image Section -->
             <div class="hidden md:block w-full md:w-1/2 ml-8">
-                <img src="{{ url_for('static', filename='colon2.jpg') }}" alt="Medical Illustration" class="w-full h-full object-cover rounded-lg">
+                <img src="colon2.jpg" alt="Medical Illustration" class="w-full h-full object-cover rounded-lg">
             </div>
         </div>
     </div>
@@ -249,4 +226,5 @@ function showFlashMessage(message, type) {
        
     </script>
 </body>
+
 </html>  
