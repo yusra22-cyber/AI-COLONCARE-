@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Colon Polyp Classification - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet>
+    <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body {
+                 background: #f8f8f8;
+             }
+             .glass-effect {
+                 background: rgba(255, 255, 255, 0.8);
+                 border-radius: 10px;
+                 box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+                 backdrop-filter: blur(10px);
+                 -webkit-backdrop-filter: blur(10px);
+                 border: 1px solid rgba(255, 255, 255, 0.3);
+             }
+             .text-gold {
+                 color: #0f0f0f;
+             }
+             .bg-gold {
+                 background-color: #FFD700;
+             }
+             .border-gold {
+                 border-color: #FFD700;
+             }
+             .input-label {
+                 transition: all 0.2s ease;
+             }
+             .input-field:focus + .input-label,
+             .input-field:not(:placeholder-shown) + .input-label {
+                 opacity: 0;
+                 visibility: hidden;
+             }
+       </style>
+</head>
+<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen">
+    <div class="container mx-auto px-4">
+        <div class="glass-effect p-8 max-w-6xl w-full mx-auto flex flex-col md:flex-row">
+            <!-- Login Form -->
+            <div class="w-full md:w-1/2 {% if register %}hidden{% endif %}" id="loginAccess">
+                <h1 class="text-3xl font-bold mb-6 text-center text-gold">Log in to your account</h1>
+                
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            {% if not register or (register and category != 'success') %}
+                                <div class="alert alert-{{ category }} mb-4 p-3 rounded {{ 'bg-red-100 text-red-700' if category == 'danger' else 'bg-green-100 text-green-700' }}">
+                                    {{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form class="space-y-6" action="{{ url_for('login') }}" method="POST" id="loginForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="relative">
+                        <input class="w-full border-b-2 border-gray-300 focus:border-gold outline-none py-2 bg-transparent text-black"
+                               id="email" name="email" type="email" required placeholder="Email">
+                    </div>
+                    <div class="relative">
+                        <input class="w-full border-b-2 border-gray-300 focus:border-gold outline-none py-2 bg-transparent text-black"
+                               id="password" name="password" type="password" required placeholder="Password">
+                        <i class="fas fa-eye absolute right-0 top-2 text-gray-500 cursor-pointer" id="toggleLoginPassword"></i>
+                    </div>
+                    <button class="w-full bg-gold text-black py-2 rounded-md hover:bg-yellow-600 transition" type="submit">
+                        Login
+                    </button>
+                </form>
+                
+                <p class="text-center mt-6 text-gray-500">
+                    Don't have an account? 
+                    <button class="text-gold hover:underline font-bold" id="showRegister">
+                        Create Account
+                    </button>
+                </p>
+            </div>
+            
+            <!-- Register Form -->
+            <div class="w-full md:w-1/2 {% if not register %}hidden{% endif %}" id="registerAccess">
+                <h1 class="text-3xl font-bold mb-6 text-center text-gold">Create new account</h1>
+                
+                <!-- Flash messages for register -->
+                {% if register %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} mb-4 p-3 rounded {{ 'bg-red-100 text-red-700' if category == 'danger' else 'bg-green-100 text-green-700' }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+                
+                <form class="space-y-6" action="{{ url_for('register') }}" method="POST" id="registerForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="relative">
+                        <input class="w-full border-b-2 border-gray-300 focus:border-gold outline-none py-2 bg-transparent text-black"
+                               id="firstName" name="firstName" type="text" required placeholder="First Name">
+                    </div>
+                    <div class="relative">
+                        <input class="w-full border-b-2 border-gray-300 focus:border-gold outline-none py-2 bg-transparent text-black"
+                               id="lastName" name="lastName" type="text" required placeholder="Last Name">
+                    </div>
+                    <div class="relative">
+                        <input class="w-full border-b-2 border-gray-300 focus:border-gold outline-none py-2 bg-transparent text-black"
+                               id="emailCreate" name="emailCreate" type="email" required placeholder="Email">
+                    </div>
+                    <div class="relative">
+                        <input class="w-full border-b-2 border-gray-300 focus:border-gold outline-none py-2 bg-transparent text-black"
+                               id="passwordCreate" name="passwordCreate" type="password" required placeholder="Password">
+                        <i class="fas fa-eye absolute right-0 top-2 text-gray-500 cursor-pointer" id="toggleRegisterPassword"></i>
+                    </div>
+                    <button class="w-full bg-gold text-black py-2 rounded-md hover:bg-yellow-600 transition" type="submit">
+                        Create Account
+                    </button>
+                </form>
+                
+                <p class="text-center mt-6 text-gray-500">
+                    Already have an account? 
+                    <button class="text-gold hover:underline font-bold" id="showLogin">
+                        Log In
+                    </button>
+                </p>
+            </div>
+            
+            <!-- Image Section -->
+            <div class="hidden md:block w-full md:w-1/2 ml-8">
+                <img src="{{ url_for('static', filename='colon2.jpg') }}" alt="Medical Illustration" class="w-full h-full object-cover rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+// In your JavaScript:
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Show loading state
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    
+    try {
+        const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            // Redirect on success
+            window.location.href = data.redirect;
+        } else {
+            // Show error message
+            showFlashMessage(data.error || 'Login failed', 'danger');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showFlashMessage('Network error. Please try again.', 'danger');
+    } finally {
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    }
+});
+
+function showFlashMessage(message, type) {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    // Create new alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} mb-4 p-3 rounded ${
+        type === 'danger' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+    }`;
+    alertDiv.textContent = message;
+    
+    // Insert after the h1 heading
+    const formContainer = document.getElementById('loginAccess');
+    const heading = formContainer.querySelector('h1');
+    heading.insertAdjacentElement('afterend', alertDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 5000);
+}  // Toggle between login and register forms
+        document.getElementById('showRegister').addEventListener('click', function() {
+            document.getElementById('loginAccess').classList.add('hidden');
+            document.getElementById('registerAccess').classList.remove('hidden');
+            window.history.pushState({}, '', '/register');
+        });
+        
+        document.getElementById('showLogin').addEventListener('click', function() {
+            document.getElementById('registerAccess').classList.add('hidden');
+            document.getElementById('loginAccess').classList.remove('hidden');
+            window.history.pushState({}, '', '/login');
+        });
+        
+        // Toggle password visibility
+        document.getElementById('toggleLoginPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+        document.getElementById('toggleRegisterPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('passwordCreate');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+       
+    </script>
+</body>
+</html>  

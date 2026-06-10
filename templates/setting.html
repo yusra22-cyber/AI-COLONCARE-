@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <title>User Information</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+         <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                background-color: #f3f4f6;
+                margin: 0;
+                padding: 0;
+            }
+           
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4rem 2rem;
+                background: linear-gradient(135deg, #D4AF37, #F5CBA7); 
+                border: 1px solid rgba(173,216,230,0.5);
+                backdrop-filter: blur(10px);
+                box-shadow: 
+                            0 0 45px rgba(173,216,230,0.4);
+            }
+            header .container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 20px;
+            }
+            .container h1 {
+                font-size: 50px;
+                color: black;
+            }
+            header nav ul {
+                display: flex;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            header nav ul li {
+                margin-left: 1rem;
+            }
+            header nav ul li a {
+                color: white;
+                text-decoration: none;
+            }
+            header nav ul li a:hover {
+                text-decoration: underline;
+            }
+            .flex {
+                display: flex;
+            }
+            aside {
+                width: 15rem;
+                background: black;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+            }
+            aside ul {
+                list-style: none;
+                padding: 1.5rem 2rem 1.5rem;
+                margin: 0;
+            }
+            aside ul li {
+                margin-bottom: 1rem;
+            }
+            aside ul li a {
+                color: gold;
+                text-decoration: none;
+                font: bold;
+                font-size: 20px;
+                font-weight: 900;
+                padding: 10px;
+                border-radius: 25px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 2px;
+            }
+            aside ul li a:hover {
+            
+        
+                border-radius: 20px;
+                transform: scale(1.5);
+            }
+            main {
+                flex: 1;
+                margin: 2rem;
+            }
+            .card {
+                background-color: #ffffff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                border-radius: 0.5rem;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                width: 100%;
+            }
+            .card h2, .card h3 {
+                margin: 0 0 1rem 0;
+                color: #2d3748;
+            }
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #4a5568;
+                font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                margin-left: 5%;
+            }
+            .form-group input, .form-group select {
+                width: 70%;
+                padding: 0.5rem;
+                border: 1px solid #cbd5e0;
+                border-radius: 0.25rem;
+                margin-left: 10%;
+            }
+            .form-group button {
+                background-color: #2d3748;
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 0.25rem;
+                cursor: pointer;
+                margin-left: 10%;
+            }
+            .form-group button:hover {
+                background-color: #4a5568;
+            }
+    
+            /* Responsive Styles */
+            @media (max-width: 768px) {
+                .container h1 {
+                    font-size: 30px;
+                }
+                aside {
+                    width: 12rem;
+                }
+                .card {
+                    width: 100%;
+                    padding: 1rem;
+                }
+                .form-group input, .form-group select {
+                    width: 100%;
+                    margin-left: 0;
+                }
+                .form-group button {
+                    width: 100%;
+                    margin-left: 0;
+                }
+            }
+    
+            @media (max-width: 480px) {
+                .container h1 {
+                    font-size: 25px;
+                }
+                aside {
+                    width: 100%;
+                }
+                .form-group input, .form-group select {
+                    width: 100%;
+                    margin-left: 0;
+                }
+                .form-group button {
+                    width: 100%;
+                    margin-left: 0;
+                }
+            }
+            .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.modal-actions {
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    margin: 0 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+#confirmDeleteBtn {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+}
+
+#cancelDeleteBtn {
+    background-color: #ccc;
+    border: none;
+}
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="container">
+                <h1>Settings</h1>
+            </div>
+        </header>
+    
+        <div class="flex">
+            <aside>
+                <ul>
+                    <li><a href="{{ url_for('website') }}"><i class="fas fa-home"></i> Home</a></li><br>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li><br>
+                    <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li><br>
+                    <li><a href="{{ url_for('logout') }}" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+                </ul>
+            </aside>
+            
+            <main>
+                <div class="card">
+                    <h2>Account Settings</h2>
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password (required for changes)</label>
+                            <input type="password" id="currentPassword" name="currentPassword" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notificationPreferences">Notification Preferences</label>
+                            <select id="notificationPreferences" name="notificationPreferences">
+                                <option value="email">Email</option>
+                                <option value="sms">SMS</option>
+                                <option value="none">No Notifications</option>
+                            </select>
+                        </div>
+                     
+                        <div class="form-group">
+                            <label for="newEmail">New Email</label>
+                            <input type="email" id="newEmail" name="newEmail">
+                            
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" name="newPassword">
+                            
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword">
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" id="saveSettings">Save Changes</button>
+                        </div>
+                    </form>
+                    
+                    <div class="danger-zone">
+                        
+                        <button type="button" id="deleteAccountBtn">Delete My Account</button>
+                    </div>
+                </div>
+                           <!-- Delete Account Modal -->
+    
+                 <div id="deleteAccountModal" class="modal">
+                   <div class="modal-content">
+                      <h2>Confirm Account Deletion</h2>
+                       <p>This will permanently delete your account and all associated data.</p>
+        
+                      <div class="form-group">
+                              <label for="deletePassword">Enter your password to confirm:</label>
+                              <input type="password" id="deletePassword" required>
+                         </div>
+        
+                     <div class="modal-actions">
+                    <button type="button" id="confirmDeleteBtn">Delete Account</button>
+                        <button type="button" id="cancelDeleteBtn">Cancel</button>
+                        </div>
+                     </div>
+               </div>
+                       
+                    </div>
+                
+                       
+                    </form>
+                </div>
+            </main>
+        </div>
+    
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get elements
+                const deleteModal = document.getElementById('deleteAccountModal');
+                const deleteBtn = document.getElementById('deleteAccountBtn');
+                const cancelBtn = document.getElementById('cancelDeleteBtn');
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                const deletePassword = document.getElementById('deletePassword');
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+                // Show modal
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        deleteModal.style.display = 'flex';
+                    });
+                }
+        
+                // Hide modal
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        deleteModal.style.display = 'none';
+                        deletePassword.value = '';
+                    });
+                }
+        
+                // Handle account deletion
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', async () => {
+                        const password = deletePassword.value.trim();
+                        
+                        if (!password) {
+                            alert('Please enter your password');
+                            return;
+                        }
+        
+                        try {
+                            const response = await fetch('/delete_account', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-Token': csrfToken
+                                },
+                                body: JSON.stringify({ password }),
+                                credentials: 'include'
+                            });
+        
+                            const data = await response.json();
+        
+                            if (!response.ok) {
+                                throw new Error(data.error || 'Failed to delete account');
+                            }
+        
+                            if (data.success) {
+                                alert(data.message || 'Account deleted successfully');
+                                window.location.href = '/login'; 
+                            } else {
+                                throw new Error(data.error || 'Deletion failed');
+                            }
+                        } catch (error) {
+                            console.error('Deletion error:', error);
+                            alert(error.message);
+                        } finally {
+                            deleteModal.style.display = 'none';
+                            deletePassword.value = '';
+                        }
+                    });
+                }
+        
+                // Close modal when clicking outside
+                window.addEventListener('click', (event) => {
+                    if (event.target === deleteModal) {
+                        deleteModal.style.display = 'none';
+                        deletePassword.value = '';
+                    }
+                });
+            });
+        </script>
+   
+    
+</body>
+</html>
